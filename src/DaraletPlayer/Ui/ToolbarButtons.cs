@@ -7,8 +7,8 @@ namespace DaraletPlayer.Ui {
     /// <summary>
     /// The game toolbar's backpack, Contracts and Map buttons, and the Character Information button (the burden pack by
     /// the link indicator), each drawn again over the game's own to open the plugin's Inventory, Quests, Map and Character
-    /// windows instead (ToolbarButton). Each is on or off by itself, from its window's settings; the game's other buttons
-    /// are left to it.
+    /// windows instead (ToolbarButton). Each is on or off by itself, from the Config tab's Client UI Override section
+    /// (ClientUiOverride); the game's other buttons are left to it.
     /// </summary>
     internal class ToolbarButtons : IDisposable {
         /// <summary>The burden pack's pictures: not overburdened, overburdened, very (BurdenLevel).</summary>
@@ -57,12 +57,42 @@ namespace DaraletPlayer.Ui {
                 + "being overburdened slows you all it can.";
         }
 
-        /// <summary>The checkbox for one button, in its window's settings (a Form.Flow row).</summary>
-        public static void RenderSetting(ref bool first, Settings settings, ref bool value, string id, string button,
-            string panel) {
-            if (Form.FlowCheck(ref first, $"Toolbar button##{id}-toolbar", ref value, $"Draws the game toolbar's {button} "
-                + $"button again over the game's own, opening this window instead of the game's {panel}. It lights up "
-                + "while the window is open, as the game's does. The game's own key for it still opens the game's.")) {
+        /// <summary>A checkbox for each button, in Client UI Override's Form.Flow row of toggles.</summary>
+        public static void RenderToggles(ref bool first, Settings settings) {
+            var data = settings.Data;
+            Setting(ref first, settings, ref data.ToolbarInventory, "Inventory", "backpack", "Inventory", "inventory");
+            Setting(ref first, settings, ref data.ToolbarQuests, "Quests", "Contracts (the quill)", "Quests",
+                "Contracts panel");
+            Setting(ref first, settings, ref data.ToolbarMap, "Map", "Map (the compass)", "Map", "map panel");
+            Setting(ref first, settings, ref data.ToolbarCharacter, "Character", "Character Information (the pack by "
+                + "the link indicator, which shows your burden)", "Character", "Character Information panel");
+        }
+
+        /// <summary>Whether all four buttons are on.</summary>
+        public static bool AllOn(SettingsData data) {
+            return data.ToolbarInventory && data.ToolbarQuests && data.ToolbarMap && data.ToolbarCharacter;
+        }
+
+        /// <summary>Whether any of the four buttons is on.</summary>
+        public static bool AnyOn(SettingsData data) {
+            return data.ToolbarInventory || data.ToolbarQuests || data.ToolbarMap || data.ToolbarCharacter;
+        }
+
+        /// <summary>Turns all four buttons on or off, for Enable all and Disable all. The caller saves.</summary>
+        public static void SetAll(SettingsData data, bool on) {
+            data.ToolbarInventory = on;
+            data.ToolbarQuests = on;
+            data.ToolbarMap = on;
+            data.ToolbarCharacter = on;
+        }
+
+        /// <summary>The checkbox for one button, in a Form.Flow row.</summary>
+        private static void Setting(ref bool first, Settings settings, ref bool value, string label, string button,
+            string window, string panel) {
+            if (Form.FlowCheck(ref first, $"{label}##toolbar-{label}", ref value, $"Draws the game toolbar's {button} "
+                + $"button again over the game's own, opening Daralet Toolkit's {window} window instead of the game's "
+                + $"{panel}. It lights up while the window is open, as the game's does. The game's own key for it still "
+                + "opens the game's.")) {
                 settings.Changed();
             }
         }

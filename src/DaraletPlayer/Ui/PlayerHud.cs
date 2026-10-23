@@ -44,7 +44,6 @@ namespace DaraletPlayer.Ui {
             icons = new ItemIcons(settings);
             ItemUser.Icons = icons;
 
-            configTab = new ConfigTab(settings);
             fellowshipTab = new FellowshipTab(feed, settings);
             combatTab = new CombatTab(feed, settings, icons);
             worldTab = new WorldTab(feed, settings);
@@ -54,6 +53,7 @@ namespace DaraletPlayer.Ui {
             characterTab = new CharacterTab(feed, settings);
             questsTab = new QuestsTab(feed, settings, worldTab.GoTo);
             lootTab = new LootTab(feed, settings, icons);
+            configTab = new ConfigTab(settings, new ClientUiOverride(settings, feed, lootTab.CorpseWindow));
             leaderboardsTab = new LeaderboardsTab(feed, api);
             toolbarButtons = new ToolbarButtons(settings, icons, inventoryTab.CarriedWindow, questsTab.Window,
                 worldTab.MapWindow, characterTab.Window);
@@ -62,7 +62,8 @@ namespace DaraletPlayer.Ui {
 
             tabs = new List<(string, string, Action)> {
                 ("Config", "Settings profiles: every setting of the plugin's as a set each character picks from, saved to "
-                    + "and added from files to keep or share.", configTab.Render),
+                    + "and added from files to keep or share. And Client UI Override: the game toolbar's buttons opening "
+                    + "the plugin's windows instead of the game's panels.", configTab.Render),
                 ("World", "A map of Dereth with Daralet's towns, dungeons, lifestones and portals, you and your fellowship, "
                     + "and an arrow to point you anywhere on it.", worldTab.Render),
                 ("Fellowship", "Your fellowship's health, stamina and mana, a vitals window you can place anywhere on "
